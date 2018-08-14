@@ -24,20 +24,9 @@ servo.on('ready', function () {
   //  and gets hot, try tuning these values (0.05 and 0.12).
   //  Moving them towards each other = less movement range
   //  Moving them apart = more range, more likely to stall and burn out
-  servo.configure(servo1, 0.05, 0.12, function () {
-    setInterval(function () {
-      console.log('Position (in range 0-1):', position);
-      //  Set servo #1 to position pos.
-      servo.move(servo1, position);
-
-      // Increment by 10% (~18 deg for a normal servo)
-      position += 0.1;
-      if (position > 1) {
-        position = 0; // Reset servo position
-      }
-      //position -= 0.1
-    }, 1000); // Every 500 milliseconds
-  });
+  servo.configure(servo1, 0.05, 0.12, function() {
+    servo.move(servo1, 0.5);
+  }); // Every 500 milliseconds
 });
 
 //++++++++++++++++++
@@ -48,10 +37,24 @@ servo.on('ready', function () {
 // });
 
 // app.use(express.static(path.join(__dirname, '/public')));
-// app.get('/stream', (request, response) => {
-//   response.redirect(camera.url);
-//   console.log(camera.url)
-// });
+  app.get('/stream', (request, response) => {
+    response.redirect(camera.url);
+    console.log(camera.url)
+  });
+
+  app.get('/servo/:direction', function(req, res, next) {
+    if (req.params.direction === 'left') {
+      position = 0.1;
+    } else if (req.params.direction === 'right'){
+      position = 0.9
+    }
+
+    if (position > 1 || direction === 'center') {
+      position = 0.5; // Reset servo position
+    }
+    next()
+  })
+
 
 // ==========================
 
@@ -65,7 +68,7 @@ servo.on('ready', function () {
 
 // http.createServer((request, response) => {
 //   response.writeHead(200, { 'Content-Type': 'image/jpg' });
-    
+
 //   camera.capture().pipe(response);
 
 // }).listen(port, () => console.log(`http://${os.hostname()}.local:${port}`));
